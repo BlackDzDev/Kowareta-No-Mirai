@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 𝐊𝐎𝐖𝐀𝐑𝐄𝐓𝐀 𝐍𝐎 𝐌𝐈𝐑𝐀𝐈</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Oswald:wght@300;500;700&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --card-bg: #111;
+            --accent: #6c5ce7; /* Cor padrão */
+            --text-main: #e0e0e0;
+            --discord-color: #5865F2;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Oswald', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* --- UI ELEMENTS FLUTUANTES --- */
+        
+        /* Botão Discord */
+        .discord-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--discord-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 1000;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            animation: floatPulse 3s infinite ease-in-out;
+        }
+
+        .discord-float:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 0 20px var(--discord-color);
+        }
+
+        .discord-icon { width: 35px; height: 35px; fill: white; }
+
+        /* Botão Personalizar (Pincel) */
+        .settings-float {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .brush-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            color: var(--accent);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .brush-btn:hover {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 0 20px var(--accent);
+            transform: rotate(90deg);
+        }
+
+        /* Menu de Cores (Escondido) */
+        #colorPickerContainer {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            width: 200px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        #colorPickerContainer h4 { margin: 0 0 15px 0; font-family: 'Cinzel', serif; color: var(--text-main); }
+        
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        @keyframes floatPulse {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* --- TELA DE LOGIN --- */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .login-box {
+            text-align: center;
+            border: 1px solid var(--accent);
+            padding: 50px;
+            border-radius: 15px;
+            background: rgba(10, 10, 10, 0.9);
+            box-shadow: 0 0 40px rgba(108, 92, 231, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box h2 { font-family: 'Cinzel', serif; color: var(--accent); font-size: 2rem; margin-bottom: 10px; }
+        
+        .login-input {
+            padding: 15px;
+            font-size: 1.1rem;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: white;
+            text-align: center;
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .login-input:focus { border-color: var(--accent); outline: none; }
+
+        .login-btn {
+            padding: 12px 40px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            text-transform: uppercase;
+            border-radius: 30px;
+            transition: 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .login-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent); }
+
+        /* --- HEADER & USER DISPLAY --- */
+        header {
+            height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, rgba(108,92,231,0.15), transparent 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        h1 { 
+            font-family: 'Cinzel', serif; 
+            font-size: clamp(2.5rem, 6vw, 4rem); 
+            margin: 0; 
+            text-shadow: 0 0 20px var(--accent); 
+            letter-spacing: 5px;
+        }
+        
+        .subtitle { color: #888; letter-spacing: 4px; margin-top: 10px; text-transform: uppercase; font-size: 0.9rem; }
+        
+        .welcome-user {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 5px 20px;
+            border-radius: 20px;
+            opacity: 0; /* Fade in via JS */
+            animation: fadeIn 2s forwards 0.5s;
+        }
+
+        /* --- ABAS DE NAVEGAÇÃO --- */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 20px 30px;
+            cursor: pointer;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: 0.3s;
+            transform: translateX(-50%);
+        }
+
+        .tab-btn:hover { color: white; }
+        .tab-btn.active { color: white; }
+        .tab-btn.active::after { width: 100%; }
+
+        /* --- CONTEÚDO PRINCIPAL --- */
+        .container { max-width: 900px; margin: 50px auto; padding: 0 20px; min-height: 60vh; }
+        .content { display: none; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .content.active { display: block; }
+
+        /* Capítulo do Livro */
+        .chapter { 
+            background: #111; 
+            padding: 50px; 
+            border-radius: 2px; 
+            margin-bottom: 40px; 
+            font-family: 'Merriweather', serif; 
+            line-height: 2;
+            font-size: 1.1rem;
+            color: #ccc;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .chapter h2 { 
+            font-family: 'Cinzel', serif; 
+            color: var(--accent); 
+            font-size: 1.8rem;
+            margin-top: 0; 
+            border-bottom: 1px solid #333; 
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chapter p { margin-bottom: 25px; }
+        .emphasis { color: var(--accent); font-weight: bold; }
+
+        /* Estilo Info */
+        .info-card { 
+            background: linear-gradient(45deg, #161616, #1a1a1a); 
+            padding: 30px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #222; 
+            transition: 0.3s;
+        }
+        .info-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .info-card h3 { color: var(--accent); margin-top: 0; font-family: 'Cinzel', serif; }
+
+        /* Estilo Manga */
+        .manga-gallery { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+        .manga-page { width: 100%; max-width: 800px; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border-radius: 4px; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        footer { text-align: center; padding: 60px; color: #444; font-size: 0.8rem; border-top: 1px solid #1a1a1a; margin-top: 50px; }
+
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2> 𝐊𝐎𝐖𝐀𝐑𝐄𝐓𝐀 𝐍𝐎 𝐌𝐈𝐑𝐀𝐈</h2>
+            <p style="color: #888;">Escolha um Nome abaixo!</p>
+            <input type="text" id="usernameInput" class="login-input" placeholder="Preencha Este Campo">
+            <button class="login-btn" onclick="submitLogin()">ENTRAR</button>
+        </div>
+    </div>
+
+    <a href="https://discord.gg/hGjZ2cdKtT" target="_blank" class="discord-float" title="Entrar no Discord">
+        <svg class="discord-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
+            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.11,77.11,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.82,105.82,0,0,0,126.6,80.22c2.36-24.44-5.42-48.18-18.9-72.15ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+        </svg>
+    </a>
+
+    <div class="settings-float">
+        <button class="brush-btn" onclick="toggleColorPicker()" title="Personalizar Tema">🖌️</button>
+        <div id="colorPickerContainer">
+            <h4>Cor do Tema</h4>
+            <input type="color" id="accentColor" onchange="changeTheme(this.value)" value="#6c5ce7">
+        </div>
+    </div>
+
+    <div id="mainSite" style="display:none;">
+        
+        <header>
+            <h1>KOWARETA NO MIRAI</h1>
+            <div class="subtitle">Um Futuro Quebrado</div>
+            <div id="welcomeMsg" class="welcome-user"></div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'livro')">Livro</button>
+            <button class="tab-btn" onclick="openTab(event, 'manga')">Mangá</button>
+            <button class="tab-btn" onclick="openTab(event, 'info')">Informações</button>
+        </nav>
+
+        <div class="container">
+            
+            <div id="livro" class="content active">
+                
+                <div class="chapter">
+                    <h2>Capítulo 1 - Garoto Invisível...</h2>
+                    <p>Em 2008, Akira tinha seis anos e gostava de observar. Não pessoas. Coisas pequenas demais para chamar atenção. Poeira flutuando quando a luz entrava pela janela da sala. Formigas andando em fila perto do muro da escola. O som da água caía lentamente na pia, gota após gota.</p>
+                    <p>Essas coisas não projetaram resposta. Não julgaram. Não machucaram. Akira era um garoto quieto, mas não triste. Falava um pouco porque pensar era mais fácil do que falar. Enquanto outras crianças corriam, gritavam e brigavam por atenção, elas preferiam ficar sentadas, desenhando no canto do caderno. Nunca mostrei os desenhos para ninguém. Não há necessidade de ser visto.</p>
+                    <p>Os adultos diziam que ele era educado. As outras crianças diziam que ele era estranho. Em casa, o silêncio era normal. Naquela época, não era pesado. Apenas existia. Os pais trabalharam muito, o irmão mais velho quase sempre estava fora, ocupado demais com coisas que Akira ainda não entendia. Sem perceber, ele aprendeu a ocupar pouco espaço. A não interrupção. Uma espera.</p>
+                    <p>Em 2014, quando Akira tinha doze anos, tudo mudou. Não foi bonito. Nem dramático como nos filmes. Foi rápido, confuso e cheio de adultos falando baixo demais. Perguntas que ninguém respondeu direito. Olhares longos demais para um garoto que ainda não entendeu o que tinha perdido.</p>
+                    <p>Depois disso, a casa ficou grande demais. E silenciosa demais. Os pais não voltam.</p>
+                    <p>Ren tinha dezassete anos quando passou a ser a única coisa que restou. Velho demais para ser só um irmão. Novo demais para ser pai. Ele está equipado. Akira via isso todos os dias. Através do cansaço nos olhos. Os horários extraordinários. As mãos machucadas, sempre com algum curativo improvisado. Ren disse que estava tudo bem. Akira fingiu acreditar. Mas alguma coisa se perdeu ali. Algo que nunca mais voltou ao lugar.</p>
+                    <p>Em 2016, Akira percebeu que as pessoas tiveram um olhar diferente. No começo, vinha com pena. Depois, com curiosidade. Mais tarde, a palavra começou a aparecer nos cochichos, dita como se fosse um apelido qualquer: <span class="emphasis">Órfão.</span></p>
+                    <p>Akira não sabia quando exatamente aquilo deixou de fazer e virou apenas parte dele. A escola continua a mesma. O recreio virou intervalo. As brincadeiras viraram empurrões disfarçados. Risadas que diminuíam quando ele se aproximava. O “foi sem querer” que acontecia vezes demais para ser acidente.</p>
+                    <p>Nada grande. Nada que esse problema. Nada que alguém se importe o bastante para impedir. Ainda assim, Akira passou a prestar mais atenção nas pessoas do que no mundo. Aprendeu a considerar olhares. Tons de voz. Passos se aproximando rápido demais. Aprendeu quando era melhor sair do caminho. Quando ficar quieto era mais seguro.</p>
+                    <p>Sem perceber, começou a ocupar ainda menos espaço.</p>
+                    <p>Agora era 2024. Akira tinha dezisseis anos. O corredor da escola estava cheio. Risadas altas, passos apressados, vozes se cruzando sem cuidado. Vida acontecendo rápido demais. Ele andava olhando para o chão, acompanhando as linhas das lajotas, mantendo o ritmo certo para não esbarrar em ninguém.</p>
+                    <p>A mochila velha pesava no ombro. Não pelos livros. Pelo hábito. Ombros levemente curvados. Corpo sempre pronto para sair do caminho antes mesmo de ser empurrado. Parou por um segundo perto da janela de uma sala para ajustar a alça. O reflexo no vidro mostrou alguém mais alto do que ele lembrava ser. Mais magro também. Os mesmos olhos atentos de sempre. Cansados.</p>
+                    <p>O sinal tocou. Akira respirava fundo e sons em frente, já sabendo onde iria sentar. Sem fundo. Perto da parede. Onde ninguém procurou olhar duas vezes. O garoto que gostava de observar ainda existia em algum lugar dentro dele. Mas agora, observe para sobreviver.</p>
+                </div>
+
+                <div class="chapter">
+                    <h2>Capítulo 2 - Onde o medo Começa...</h2>
+                    <p>O dia não terminou quando o sinal tocou. Akira descobriu isso enquanto atravessava o portão da escola, sentindo aquele estranho que só aparece quando algo fora do silêncio do normal se aproxima. As conversas diminuíram. Os risos ficaram mais baixos. Alguns alunos aceleraram o passo.</p>
+                    <p>Eles ali. Os garotos que ninguém chamava pelo nome. Uniformes abertos, postura relaxada demais, olhares atentos ao redor como quem já sabe que o espaço vai se abrir. Ninguém esbarrava neles. Ninguém fez piada. Respeito não era a palavra certa. Medo era mais honesto.</p>
+                    <p>Akira observou de longe, parado por um instante. O coração acelerou sem que ele entendesse bem o porquê. Não era inveja. Não era admiração. Era pânico.</p>
+                    <p>Eles eram altos. Um deles empurrou um garoto menor, como se fosse brincadeira. O garoto pediu desculpas imediatamente. Nem tinha feito nada. Akira engoliu em seco. Eles não pediram desculpas. Eles nunca pediram.</p>
+                    <p>No caminho de casa, manteve os fones desligados. Aprender a ouvir o ambiente era mais seguro do que se distrair. Cada esquina parecia longa demais. Cada grupo, um problema possível. Chegou ao prédio pouco depois das seis. O apartamento estava vazio. Akira largou a mochila perto da porta e tirou os tênis com cuidado. O chão rangeu. Sempre rangia.</p>
+                    <p>Ele caminhou até a cozinha e abriu a geladeira mais por hábito do que por fome. Pouca coisa. Fechou a porta e foi enviado à mesa, apoiando os cotovelos. O celular vibra.<br>Ren: <span class="emphasis">Vou chegar tarde hoje.</span><br>Akira leu uma mensagem duas vezes. Não respondeu imediatamente.</p>
+                    <p>Ren sempre chegava tarde. Mas “tarde” finalmente tinha um peso diferente. Akira não sabia explicar. Apenas sentido. Às vezes, o irmão chegava com o olhar distante demais. Outras, com marcas que não combinavam com trabalho comum. — Não é da minha conta — murmurou para si mesmo.</p>
+                    <p>Comeu qualquer coisa e foi para o quarto. Tentei estudar. Não consegui. As cenas da escola voltavam sem pedir permissão. O empurrão. As risadas. A facilidade com que tudo conta. Quando deu por si, já era noite fechada.</p>
+                    <p>Ren chegou depois das dez. Akira abriu a porta e fingiu continuar deitado. Passos pesados. O som da chave está sendo largada. Um suspiro cansado demais.<br>— Akira? — Chamou Ren, baixo.<br>— Tô acordado — respondeu.<br>Ren apareceu na porta. Camisa social amassada. Um pequeno novo decorativo na mão. Os olhos atentos demais para alguém tão cansado.</p>
+                    <p>— Como foi a escola?<br>Akira hesitou por um segundo.<br>— Normal.<br>Ren assentiu, como se tivesse esperado aquela resposta.<br>— Continua assim — disse. — Fica longe de confusão.</p>
+                    <p>Akira comentou o irmão sair do quarto sem dizer mais nada. Ficou encarando o teto por alguns minutos, sentindo algo estranho no peito. Confusão parecia encontrar pessoas sozinhas. Na manhã seguinte, Akira chegou mais cedo. Achei que isso ajudaria. Não ajudou.</p>
+                    <p>No vestiário, enquanto trocava de roupa, veja os olhares. Um deles fechou a porta. Outro rio. O som do clique do celular foi baixo, mas claro o suficiente. O empurrão veio sem aviso. As costas bateram no armário. O metal frio arrancou o ar dos seus pulmões. Um soco no estômago o fez dobrar. Outra nas costelas.</p>
+                    <p>— Fica esperto, esquisito — disse alguém, perto demais.<br>Akira caiu. Não tentei levantar rápido. Aprendera que isso piorava. Apenas esperou. Contou a própria respiração. Hum. Dois. Três. Quando tudo terminou, restou o chão frio e o silêncio pesado.</p>
+                    <p>No banheiro, lavou o rosto várias vezes. A água levou o sangue ralo, mas não a sensação. O espelho evoluiu para um reflexo estranho. Não quebrado. Endurecido. No intervalo, não comeu. Fiquei sentado, observando as pessoas passarem. Pela primeira vez, não foram incluídas apenas rotas de fuga. Procure padrões. Grupos. Quem conhece alto. Quem todos evitaram.</p>
+                    <p>Sem perceber, seus olhos voltaram para o portão. Os mesmos garotos do dia anterior estavam ali de novo. Rindo. Tranquilos. Intocáveis. Akira sente algo mudando, pequeno demais para ser chamado de decisão. Mas grande ou bastante para assustar. Naquela noite, deitado na cama, lembrei das palavras de Ren.</p>
+                    <p><span class="emphasis">“O mundo gosta de quem parece perigoso.”</span></p>
+                    <p>Akira os. Ele não queria machucar ninguém. Mas começou a entender por que algumas pessoas nunca apanhavam.</p>
+                </div>
+
+                <div class="chapter">
+                    <h2>Capítulo 3 - O lugar onde não se escolhe...</h2>
+                    <p>Akira passou a evitar o caminho principal. Não por medo exatamente. Medo ele já conhecia. Era outra coisa. Uma sensação de que certos lugares não existiam para pessoas como ele. Lugares onde o espaço já estava ocupado antes mesmo dele chegar.</p>
+                    <p>Naquela tarde, saí da escola mais tarde do que o normal. Detenção silenciosa, aplicada sem explicação clara. Não adiantou discutir. Nunca adiantava. O céu estava nublado. O tipo de cinza que não ameaça chuva, mas pesa no ar. Ele escolheu cortar o caminho por uma rua lateral. Foi um erro. Percebeu tarde demais.</p>
+                    <p>Um grupo ocupava a calçada à frente. Vozes conhecidas. Risadas simples. Postura relaxada demais para quem não se preocupa com o entorno. Os mesmos garotos. Akira atrasou o passo. Pensei em virar. Pensei em fingir uma ligação. Pensei em correr. Nenhuma opção pareceu boa.</p>
+                    <p>— Ei.<br>A palavra foi dita sem pressa. Não era um chamado alto. Não preciso ser. Akira parou. Um dos garotos se virou. Alto. Olhar orgânico. Um sorriso que não chegava aos olhos.<br>— Tu é da escola ali, né?<br>Akira assentiu, devagar.<br>— Te vejo sempre quieto — continua o garoto. — Você e você está olhando muito.</p>
+                    <p>Não era acusação. Nem convite. Era constatação.<br>— Desculpa — Akira respondeu, automático.<br>Alguns riram.<br>— Relaxa — disse outro. — A gente só estava curiosa.<br>Curioso era outra palavra estranha. Akira sentiu o estômago apertar.<br>— Qual seu nome? — Disse o primeiro.<br>— Akira.<br>O nome ficou suspenso por um instante.<br>— Japonês, hein — comentou alguém. — Combinação silenciosa.<br>Mais risos.</p>
+                    <p>Um deles deu um passo à frente. Não invada o espaço. Apenas o suficiente para Akira sentir o cheiro de cigarro.<br>— Tu apanha na escola?<br>O silêncio foi imediatamente. Akira não respondeu. O garoto sorriu.<br>— Já respondeu.<br>Não houve soco. Nem empurrão. Nada físico. E ainda assim, Akira saiu dali tremendo.</p>
+                    <p>— Pode ir — disse o garoto, se afastando. — Mas preste atenção em quem você observa.<br>Akira não olhou para trás enquanto se afastava. Só respirou de novo quando dobrou a esquina.</p>
+                    <p>Em casa, encontrei Ren sentado à mesa. Isso era estranho. Ren não estava com camisa social. Usava uma jaqueta escura. O acessório na mão tinha sido trocado. Havia algo diferente nele. Uma tensão contida, como se estivesse sempre pronto para levantar.</p>
+                    <p>— Chegou cedo — disse Ren.<br>— Caminho diferente — respondeu Akira.<br>Ren o olhou por alguns segundos a mais do que o normal.<br>— Aconteceu alguma coisa?<br>Akira abriu a boca. Fechou.<br>— Não.<br>Mentira fácil. Treinada.</p>
+                    <p>Ren suspirou e acendeu um cigarro perto da janela.<br>— Akira… — começou, mas parou. O silêncio voltou a ocupar o espaço entre os dois.<br>— Só lembra de uma coisa — disse Ren, por fim. — Tem portas que, quando se atravessa, não fecham mais.</p>
+                    <p>Akira assentiu. Mas já era tarde. No quarto, deitado no escuro, a cena da rua se repete na mente. O tom tranquilo. O controle absoluto. Ninguém conhecia. Ninguém precisou. Não era força. Era Posição. Akira lembrou do vestiário. Do chão frio. Das risadas abafadas. Lembrou do jeito como todos pediam desculpas para aqueles garotos sem ter feito nada.</p>
+                    <p>Ele virou de lado, encarando a parede. Talvez o problema não fosse fraco. Talvez não estivesse no lugar errado. Pela primeira vez, Akira se perguntou: <span class="emphasis">E se o caminho para não apanhar fosse atravessar aquela porta?</span></p>
+                    <hr style="border-color:#333; margin: 30px 0;">
+                    <p style="text-align: center; color: var(--accent); font-weight: bold; letter-spacing: 1px;">Fim da Part 1 do Volume 5 | Kowareta No Mirai</p>
+                </div>
+
+            </div>
+
+            <div id="manga" class="content">
+                <div class="manga-gallery">
+                    <p style="color:#666; font-style: italic;">* Galeria de Páginas *</p>
+                    <img src="https://cdn.discordapp.com/attachments/1462903119737262232/1464792100297244712/69bb7a52-37d2-4515-8bcc-da51ae175ab5.jpeg?ex=6976c173&is=69756ff3&hm=9e9972cb3d7dd5b9192564ac637b91bfb7868158d2169a7a988a2634e2b106f4&" class="manga-page" alt="Capa">
+                    <img src="https://cdn.discordapp.com/attachments/1464345523073843260/1464693580932059146/image.png?ex=697665b2&is=69751432&hm=7bd4bbbf16859488b59a1787387b57eecfe998929e4c723f1c9a211846748617&" class="manga-page" alt="Página 1">
+                    <img src="https://cdn.discordapp.com/attachments/1464345523073843260/1464693581246758964/AOI_d_9e90qjHrR2UsGmgohtXJkCYPQXYobBI7vS0UNlGRbOBpBkUrB3PVRN1WmIwWN5-LnwNt-uLHm9i32QpzhKVCyv7tDDHPqcplNiYKN6GzCNHJNn5orAbFRVWJjq7UsjPXqT17JZCmf0ZVECwV84UwuXvCHUNdhLTgr35qz4zIstlrA5gAs1024-rj.png?ex=697665b2&is=69751432&hm=2e9ab6519e10f5f1e837e57e1e03f8ca00695f12c0cf952c7c0c8391d71f2e21&" class="manga-page" alt="Página 2">
+                    <img src="https://cdn.discordapp.com/attachments/1464345523073843260/1464693581699612764/ABS2GSnydS5e16c81xL-KXdFZYna7QVsvbueNc5ONxA-vzUMtm-nXEPvn8H1log49qifttwTHrodKWc7of_BKvfH5DBrnTA6hnX6FC2MX0xF0GBBe5oa_0HYzMEQpV2lMNnNClitZDV1bRv5zVhZL-JuvnVx7muvdInwLBAXvmY82VKN_dTTrgs1024-rj.png?ex=697665b2&is=69751432&hm=00f4abc952d31d0461249e122029cd014da1cfc96642156dba81750dc8e61d1a&" class="manga-page" alt="Página 3">
+                </div>
+            </div>
+
+            <div id="info" class="content">
+                <div class="info-card" style="text-align: center;">
+                    <h3>📸 Ren e Akira</h3>
+                    <img src="https://cdn.discordapp.com/attachments/1464105827874111518/1464796419993899203/d5e7f99f-61d8-4ac5-8ecb-7a456cb8aaec.png?ex=6976c579&is=697573f9&hm=16d055105b98319272b4ef1e6e0a86c9aeb3eea7d2ce6751166bf4f277819e6f&" alt="Ren e Akira" style="width: 100%; max-width: 600px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid var(--accent); margin-top: 10px;">
+                </div>
+
+                <div class="info-card">
+                    <h3>👤 Akira (Protagonista)</h3>
+                    <p>Akira é o "observador invisível". Sua jornada começa não com a força, mas com o entendimento doloroso de que a bondade não o protege. Ele está no limiar de abandonar a moralidade para entrar para uma gangue, mais acaba percebendo que ser gangster nao e so ter "Status".</p>
+                </div>
+                <div class="info-card">
+                    <h3>🚬 Ren (Irmão/Mentor)</h3>
+                    <p>O pilar que restou da família. Ren carrega cicatrizes físicas e emocionais. Sua visão de mundo ("O mundo gosta de quem parece perigoso") é o gatilho que vai mudar a vida de Akira, Ren guarda muitos segredos...</p>
+                </div>
+                <div class="info-card">
+                    <h3>📖 Temas Centrais</h3>
+                    <p>A obra trata de um menino que sofre bullying, e quer se tornar um gangster, mais nao sabe oque e ser um!.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Kowareta No Mirai | By Mikey, Gabzz, Ishida & Salah</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- SEGURANÇA CONTRA DEV TOOLS ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false; // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
+        }
+
+        setInterval(function() {
+            var startTime = performance.now();
+            debugger;
+            var endTime = performance.now();
+            if (endTime - startTime > 100) {
+                window.location.reload();
+            }
+        }, 1000);
+
+        // --- FUNCIONALIDADES DO SITE ---
+
+        function submitLogin() {
+            var inputName = document.getElementById("usernameInput").value;
+            if (inputName.trim() !== "") {
+                document.getElementById("loginOverlay").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("loginOverlay").style.display = "none";
+                    document.getElementById("mainSite").style.display = "block";
+                    document.getElementById("welcomeMsg").innerText = "Bem-vindo, " + inputName;
+                }, 500);
+            } else {
+                alert("Por favor, digite um NickName.");
+            }
+        }
+
+        function openTab(evt, tabName) {
+            var i, content, tablinks;
+            content = document.getElementsByClassName("content");
+            for (i = 0; i < content.length; i++) {
+                content[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function toggleColorPicker() {
+            var picker = document.getElementById("colorPickerContainer");
+            if (picker.style.display === "block") {
+                picker.style.display = "none";
+            } else {
+                picker.style.display = "block";
+            }
+        }
+
+        function changeTheme(color) {
+            document.documentElement.style.setProperty('--accent', color);
+        }
+    </script>
+
+</body>
+</html>
